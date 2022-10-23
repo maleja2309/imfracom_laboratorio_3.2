@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Cliente 
 {
     public static final int PUERTO = 1300;
-    public static final String SERVIDOR = "localhost";
+    public static final String SERVIDOR = "192.168.1.9";
 
     public static void main(final String[] args) throws Exception
     {

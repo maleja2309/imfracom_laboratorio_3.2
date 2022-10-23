@@ -35,29 +35,41 @@ public class ProtocoloServidor extends Thread
         
         socket.receive(confConec);
         
+        
         try 
         {                                   
             if (option.equals("1"))
             {
                 init = System.nanoTime();
                 file = "C:/Users/malej/OneDrive - Universidad de los Andes/Semestres/Semestre 9/infracom/Laboratorios/3.2/Laboratorio_3_2/Archivos_de_Envio/100MB.txt"; 
-
-                sendFile(file);
                 name = "100MB";
-                byte[] conec = name.getBytes();
-                DatagramPacket confirmacion = new DatagramPacket(conec, 
-                                                                 conec.length,
-                                                                 InetAddress.getByName("localhost"),
-                                                                 3400);
             }
             else
             {
                 init = System.nanoTime();
                 file = "C:/Users/malej/OneDrive - Universidad de los Andes/Semestres/Semestre 9/infracom/Laboratorios/3.2/Laboratorio_3_2/Archivos_de_Envio/250MB.txt"; 
-                sendFile(file);
                 name = "250MB";
             }
-
+            
+            // Enviar Digest 
+            cifrado = Digest.getDigestFile(file);
+            DatagramPacket digests = new DatagramPacket(cifrado, 
+                                                        cifrado.length,
+                                                        InetAddress.getByName("localhost"),
+                                                        1300);
+            socket.send(digests);
+            
+            // Enviar nombre del archivo
+            DatagramPacket nombre_file = new DatagramPacket(name.getBytes(), 
+                                                            name.getBytes().length,
+                                                            InetAddress.getByName("localhost"),
+                                                            1300);
+            
+            socket.send(nombre_file);
+            
+            // Envío del archivo
+            sendFile(file);
+            
             System.out.println("Se transmitió el archivo");
 
             // Tiempo Final
@@ -69,7 +81,7 @@ public class ProtocoloServidor extends Thread
             file2 = file2.concat(java.time.LocalDateTime.now().toString().replace(":","-"));
             file2 = file2.concat("-servidor.txt");
 
-            log_s(file2, name, name, time);                 
+            log_s(file2, name, name, time);                     
         }
         catch (Exception e) 
         {

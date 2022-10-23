@@ -23,6 +23,8 @@ public class ProtocoloCliente
     private static DatagramSocket socket = null;
     private static DataInputStream dataInputStream = null;
     static String id;
+    static String digest;
+    static String cifrado;
 
 	public static void procesar(DatagramSocket socket2, String num_cliente) throws Exception
     {
@@ -36,10 +38,16 @@ public class ProtocoloCliente
                                                          InetAddress.getByName("localhost"),
                                                          3400);
         socket.send(confirmacion);
-        //
+        
+        // Recibir Digest 
+        DatagramPacket digest_receive = new DatagramPacket(new byte [256], 256);
+        socket.receive(digest_receive);
+        digest = Digest.imprimirHexa(digest_receive.getData());
+                
+        // Recibir nombre
         DatagramPacket archivo = new DatagramPacket(new byte [256], 256);
-        String archivo2 = new String(archivo.getData(), StandardCharsets.UTF_8);
         socket.receive(archivo);
+        String archivo2 = new String(archivo.getData(), archivo.getOffset(), archivo.getLength()).trim();
 
         String destino = "C:/Users/malej/OneDrive - Universidad de los Andes/Semestres/Semestre 9/infracom/Laboratorios/3.2/Laboratorio_3_2/ArchivosRecibidos/";
         destino = destino.concat("Cliente");
@@ -83,9 +91,14 @@ public class ProtocoloCliente
 
                 // Tiempo Final
                 float end = System.nanoTime();
-
+                
+                // Comprobación integridad del archivo 
+                
+                cifrado = Digest.imprimirHexa(Digest.getDigestFile(fileName));
+                Boolean estado = cifrado.equals(digest);
+                
                 String time = Float.toString(end-init) + " ns";
-                log_c(file2, archivo, time);  
+                log_c(file2, archivo, time, estado);  
                 System.out.println("Fin de la transmisión del archivo");
                 socket.close();
                 break;
@@ -93,7 +106,7 @@ public class ProtocoloCliente
         }
     }    
     
-    public static void log_c(String path, String nombre, String tiempo)
+    public static void log_c(String path, String nombre, String tiempo, Boolean estado)
     {
         try 
         {
@@ -104,6 +117,7 @@ public class ProtocoloCliente
             writeFile.write("\n Nombre: " + nombre);
             writeFile.write("\n TamaÃ±o: " + nombre);
             writeFile.write("\n Tiempo: " + tiempo);
+            writeFile.write("\n Estado: " + Boolean.toString(estado));
             writeFile.write("\n Log: " + "Cliente");
             writeFile.close();
         } 
