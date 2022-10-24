@@ -1,4 +1,4 @@
-package contenedor;
+package intento;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,9 +34,7 @@ public class ProtocoloCliente
         // Enviar mensaje al servidor para la conexiÃ³n 
         byte[] conec = "Confirmacion".getBytes();
         DatagramPacket confirmacion = new DatagramPacket(conec, 
-                                                         conec.length,
-                                                         InetAddress.getByName("localhost"),
-                                                         3400);
+                                                         conec.length);
         socket.send(confirmacion);
         
         // Recibir Digest 
@@ -48,6 +46,8 @@ public class ProtocoloCliente
         DatagramPacket archivo = new DatagramPacket(new byte [256], 256);
         socket.receive(archivo);
         String archivo2 = new String(archivo.getData(), archivo.getOffset(), archivo.getLength()).trim();
+
+
 
         String destino = "C:/Users/malej/OneDrive - Universidad de los Andes/Semestres/Semestre 9/infracom/Laboratorios/3.2/Laboratorio_3_2/ArchivosRecibidos/";
         destino = destino.concat("Cliente");
@@ -69,7 +69,7 @@ public class ProtocoloCliente
         byte[] buffer = new byte[4 * 1024];
         DatagramPacket info = new DatagramPacket(buffer, buffer.length);
         
-        // Especificación time Out
+        // Especificaciï¿½n time Out
         socket.setSoTimeout(10000);
         
         while(true)
@@ -92,14 +92,16 @@ public class ProtocoloCliente
                 // Tiempo Final
                 float end = System.nanoTime();
                 
-                // Comprobación integridad del archivo 
+                // Comprobaciï¿½n integridad del archivo 
                 
                 cifrado = Digest.imprimirHexa(Digest.getDigestFile(fileName));
                 Boolean estado = cifrado.equals(digest);
                 
                 String time = Float.toString(end-init) + " ns";
+
+
                 log_c(file2, archivo, time, estado);  
-                System.out.println("Fin de la transmisión del archivo");
+                System.out.println("Fin de la transmisiï¿½n del archivo");
                 socket.close();
                 break;
             }           

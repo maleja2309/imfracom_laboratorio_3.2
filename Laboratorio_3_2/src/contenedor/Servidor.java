@@ -1,7 +1,8 @@
-package contenedor;
+package intento;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.Scanner;
 
 public class Servidor

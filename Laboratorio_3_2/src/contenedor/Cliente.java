@@ -1,4 +1,4 @@
-package contenedor;
+package intento;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 public class Cliente 
 {
-    public static final int PUERTO = 1300;
-    public static final String SERVIDOR = "192.168.1.9";
+    public static final int PUERTO = 3400;
+    public static final String SERVIDOR = "localhost";
 
     public static void main(final String[] args) throws Exception
     {
@@ -22,7 +22,8 @@ public class Cliente
         try 
         {
             // Crea el Socket en el lado cliente 
-            socket = new DatagramSocket(PUERTO, InetAddress.getByName(SERVIDOR));
+            socket = new DatagramSocket();
+            socket.connect(InetAddress.getByName(SERVIDOR), PUERTO);
         }
         catch (Exception e) 
         {
@@ -33,3 +34,5 @@ public class Cliente
         ProtocoloCliente.procesar(socket, num_cliente);
     }    
 }
+
+

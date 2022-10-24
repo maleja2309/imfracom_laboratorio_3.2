@@ -1,4 +1,4 @@
-package contenedor;
+package intento;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -16,6 +16,8 @@ public class ProtocoloServidor extends Thread
     static String option;
     private static DataOutputStream dataOutputStream = null;
     static DatagramSocket socket;
+    static InetAddress IP_Cliente;
+    static int port_Cliente;
     
     public  ProtocoloServidor(DatagramSocket socket2, String Option)
     {
@@ -32,10 +34,12 @@ public class ProtocoloServidor extends Thread
         float init = 0;
 
         DatagramPacket confConec = new DatagramPacket(new byte [256], 256);
-        
+
         socket.receive(confConec);
-        
-        
+
+        IP_Cliente = confConec.getAddress();
+        port_Cliente = confConec.getPort();
+
         try 
         {                                   
             if (option.equals("1"))
@@ -55,22 +59,22 @@ public class ProtocoloServidor extends Thread
             cifrado = Digest.getDigestFile(file);
             DatagramPacket digests = new DatagramPacket(cifrado, 
                                                         cifrado.length,
-                                                        InetAddress.getByName("localhost"),
-                                                        1300);
+                                                        IP_Cliente,
+                                                        port_Cliente);
             socket.send(digests);
             
             // Enviar nombre del archivo
             DatagramPacket nombre_file = new DatagramPacket(name.getBytes(), 
                                                             name.getBytes().length,
-                                                            InetAddress.getByName("localhost"),
-                                                            1300);
+                                                            IP_Cliente,
+                                                            port_Cliente);
             
             socket.send(nombre_file);
             
-            // Envío del archivo
+            // Envï¿½o del archivo
             sendFile(file);
             
-            System.out.println("Se transmitió el archivo");
+            System.out.println("Se transmitiï¿½ el archivo");
 
             // Tiempo Final
             float end = System.nanoTime();
@@ -101,7 +105,10 @@ public class ProtocoloServidor extends Thread
         byte buffer[] = new byte[4 * 1024];
         while ((bytes = fileInputStream.read(buffer)) != -1) 
         {
-            DatagramPacket info_file = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("localhost"), 1300);
+            DatagramPacket info_file = new DatagramPacket(buffer,
+                                                          buffer.length, 
+                                                          IP_Cliente, 
+                                                          port_Cliente);
             
             // Envï¿½o del segmento
             socket.send(info_file);
